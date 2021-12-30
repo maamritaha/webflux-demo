@@ -3,12 +3,12 @@
 this project is a spring webflux demo
 
 ###Project build and start
-this project can be started in local machine or with docker containers
+this project can be started in a local machine or using docker containers
 
 ####With local machine
-to start the project in local machine :
+to start the project using a local machine :
 * make sure that [postgres](https://www.postgresql.org/) is installed
-* adapt .env liquibase.properties and application.yml files with postgres configuration
+* adapt .env liquibase.properties and application.yml files with the postgres configuration
 * run command [./mvnw clean package]
 * run command [./mvnw liquibase:update] 
 * run command [java -jar ./target/*.jar]
