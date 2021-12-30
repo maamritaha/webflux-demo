@@ -1,0 +1,44 @@
+version: '3.1'
+
+services:
+  app:
+    image: 'api'
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    container_name: artist-app
+    ports:
+      - 8080:8080
+    depends_on:
+      - liquibase
+    environment:
+      - spring.r2dbc.url=${R2DBC_URL}
+      - spring.r2dbc.username=${POSTGRES_USER}
+      - spring.r2dbc.password=${POSTGRES_PASSWORD}
+      - logging.level.org.springframework.r2dbc=DEBUG
+  liquibase:
+    image: liquibase/liquibase
+    container_name: liquibase-migration
+    depends_on:
+      - db
+    command: --log-level=INFO --url=${JDBC_URL} --changeLogFile=changelog-root.xml update
+    volumes:
+      - ./src/main/resources/db/changelogs/changelog-root.xml:/liquibase/changelog-root.xml
+      - ./src/main/resources/db/changelogs/changelog-v1.0.xml:/liquibase/db/changelogs/changelog-v1.0.xml
+
+  db:
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  adminer:
+    image: adminer
+    restart: always
+    depends_on: 
+      - db
+    ports:
+      - 8090:8080
