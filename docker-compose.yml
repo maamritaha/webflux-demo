@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3'
 
 services:
   app:
@@ -12,7 +12,7 @@ services:
     depends_on:
       - liquibase
     environment:
-      - spring.r2dbc.url=${R2DBC_URL}
+      - spring.r2dbc.url=r2dbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       - spring.r2dbc.username=${POSTGRES_USER}
       - spring.r2dbc.password=${POSTGRES_PASSWORD}
       - logging.level.org.springframework.r2dbc=DEBUG
@@ -21,24 +21,22 @@ services:
     container_name: liquibase-migration
     depends_on:
       - db
-    command: --log-level=INFO --url=${JDBC_URL} --changeLogFile=changelog-root.xml update
+    command: --log-level=INFO --url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD} --changeLogFile=workspace/changelog-root.xml update
     volumes:
-      - ./src/main/resources/db/changelogs/changelog-root.xml:/liquibase/changelog-root.xml
-      - ./src/main/resources/db/changelogs/changelog-v1.0.xml:/liquibase/db/changelogs/changelog-v1.0.xml
-
-  db:
-    image: postgres:alpine
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ./src/main/resources/db/changelogs/:/liquibase/workspace
 
   adminer:
     image: adminer
     restart: always
-    depends_on: 
+    depends_on:
       - db
     ports:
       - 8090:8080
+
+  db:
+    image: postgres:latest
+    command: -p ${POSTGRES_PORT}
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
