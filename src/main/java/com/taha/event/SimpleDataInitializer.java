@@ -1,6 +1,6 @@
 package com.taha.event;
 
-import com.taha.bean.Artist;
+import com.taha.bean.ArtistEntity;
 import com.taha.repository.ArtistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -19,7 +19,7 @@ public class SimpleDataInitializer {
     @EventListener(ApplicationReadyEvent.class)
     public void go() {
         var artists = Flux.just("James", "Kirk", "Lars")
-                .map(name -> Artist.builder().name(name).build())
+                .map(name -> ArtistEntity.builder().name(name).build())
                 .flatMap(this.artistRepository::save);
         this.artistRepository
                 .deleteAll()
