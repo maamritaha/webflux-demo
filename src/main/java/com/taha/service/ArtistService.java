@@ -36,12 +36,15 @@ public class ArtistService {
 
     public Mono<ArtistDto> update(final ArtistDto artistDto) {
         ArtistEntity artistEntity = ArtistMapper.INSTANCE.artistDtoToArtistEntity(artistDto);
-        return artistRepository.findById(artistEntity.getId()).map(v -> artistEntity)
+        return artistRepository.findById(artistEntity.getId())
+                .switchIfEmpty(ArtistExceptions.artistNotFoundException(artistEntity)).map(v -> artistEntity)
                 .flatMap(artistRepository::save).map(ArtistMapper.INSTANCE::artistEntityToArtistDto);
     }
 
     public Mono<Void> delete(final Long id) {
-        return artistRepository.deleteById(id);
+        return artistRepository.findById(id)
+                .switchIfEmpty(ArtistExceptions.artistNotFoundException(id))
+                .flatMap(artistRepository::delete).then();
     }
 
 }

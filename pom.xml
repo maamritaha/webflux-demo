@@ -15,6 +15,12 @@
     <description>Demo project for spring reactor</description>
     <properties>
         <java.version>11</java.version>
+        <blockhound.version>1.0.3.RELEASE</blockhound.version>
+        <mapstruct.version>1.2.0.Final</mapstruct.version>
+        <jakarta.validation-api.version>2.0.2</jakarta.validation-api.version>
+        <jacoco.plugin.version>0.8.7</jacoco.plugin.version>
+        <liquibase.plugin.version>4.3.5</liquibase.plugin.version>
+        <postgres.for.liquibase.version>42.2.24</postgres.for.liquibase.version>
     </properties>
     <dependencies>
         <dependency>
@@ -55,34 +61,36 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.4.32.Final</version>
-        </dependency>
+
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>2.0.2</version>
+            <version>${jakarta.validation-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>1.2.0.Final</version>
+            <version>${mapstruct.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
-            <version>1.2.0.Final</version>
+            <version>${mapstruct.version}</version>
         </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>io.projectreactor.tools</groupId>
+            <artifactId>blockhound</artifactId>
+            <version>${blockhound.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -99,13 +107,60 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.plugin.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>META-INF/**</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.83</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>CLASS</counter>
+                                            <value>MISSEDCOUNT</value>
+                                            <maximum>0</maximum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.liquibase</groupId>
                     <artifactId>liquibase-maven-plugin</artifactId>
-                    <version>4.3.5</version>
+                    <version>${liquibase.plugin.version}</version>
                     <configuration>
                         <propertyFile>classpath:liquibase.yml</propertyFile>
                     </configuration>
@@ -113,7 +168,7 @@
                         <dependency>
                             <groupId>org.postgresql</groupId>
                             <artifactId>postgresql</artifactId>
-                            <version>42.2.24</version>
+                            <version>${postgres.for.liquibase.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>

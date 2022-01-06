@@ -26,3 +26,4 @@ wait_for_command "docker-compose exec db psql 'host=${POSTGRES_HOST} \
 docker-compose up --build -d
 wait_for_url "http://localhost:8080/actuator/health"
 echo -e "${green}project started${NC}"
+x-www-browser http://localhost:8080/actuator/health
