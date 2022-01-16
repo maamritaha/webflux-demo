@@ -4,9 +4,11 @@ services:
   app:
     image: 'api'
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile
+      context: ../../
+      dockerfile: ./.docker/project/Dockerfile
     container_name: artist-app
+    networks:
+      - artist-api-net
     ports:
       - 8080:8080
     depends_on:
@@ -19,15 +21,19 @@ services:
   liquibase:
     image: liquibase/liquibase
     container_name: liquibase-migration
+    networks:
+      - artist-api-net
     depends_on:
       - db
     command: --log-level=INFO --url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD} --changeLogFile=workspace/changelog-root.xml update
     volumes:
-      - ./src/main/resources/db/changelogs/:/liquibase/workspace
+      - ../../src/main/resources/db/changelogs/:/liquibase/workspace
 
   adminer:
     image: adminer
     restart: always
+    networks:
+      - artist-api-net
     depends_on:
       - db
     ports:
@@ -35,8 +41,12 @@ services:
 
   db:
     image: postgres:latest
+    networks:
+      - artist-api-net
     command: -p ${POSTGRES_PORT}
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+networks:
+  artist-api-net:

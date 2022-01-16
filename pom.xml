@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.taha</groupId>
-    <artifactId>artists-home</artifactId>
+    <artifactId>artist-home</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>artists-home</name>
     <description>Demo project for spring reactor</description>
@@ -21,6 +21,20 @@
         <jacoco.plugin.version>0.8.7</jacoco.plugin.version>
         <liquibase.plugin.version>4.3.5</liquibase.plugin.version>
         <postgres.for.liquibase.version>42.2.24</postgres.for.liquibase.version>
+        <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
+        <sonar.maven.plugin.version>3.7.0.1746</sonar.maven.plugin.version>
+        <!-- test result measurements -->
+        <project.test.result.directory>${project.build.directory}/test-results</project.test.result.directory>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.scm.provider>git</sonar.scm.provider>
+        <sonar.java.codeCoveragePlugin>jacoco</sonar.java.codeCoveragePlugin>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.test.result.directory}/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.exclusions>
+            **/*.xml
+        </sonar.exclusions>
+        <sonar.coverage.exclusions>
+            **/artists-home/*
+        </sonar.coverage.exclusions>
     </properties>
     <dependencies>
         <dependency>
@@ -108,6 +122,20 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${sonar.maven.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <argLine>${jacocoArgLine}</argLine>
+                    <reportsDirectory>${project.test.result.directory}/surefire</reportsDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.plugin.version}</version>
@@ -122,6 +150,10 @@
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <propertyName>jacocoArgLine</propertyName>
+                            <destFile>${project.test.result.directory}/jacoco/jacoco.exec</destFile>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>post-unit-test</id>
@@ -131,7 +163,8 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                            <dataFile>${project.test.result.directory}/jacoco/jacoco.exec</dataFile>
+                            <outputDirectory>${project.test.result.directory}/jacoco</outputDirectory>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>

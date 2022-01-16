@@ -8,7 +8,8 @@ RUN apt-get clean && \
 RUN groupadd --gid 5000 artistApp && \
     useradd --home-dir /home/default --create-home --uid 5000 --gid 5000 --shell /bin/sh --skel /dev/null artistApp
 USER artistApp:artistApp
-ARG JAR_FILE=target/*.jar
+#jar file path relative to docker compose context
+ARG JAR_FILE=./target/*.jar
 COPY ${JAR_FILE} /app/app.jar
 WORKDIR /app
 ENTRYPOINT ["java","-jar","app.jar"]

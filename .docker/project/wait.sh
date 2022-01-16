@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+Red="\033[0;31m"
+ColorReset='\033[0m'
 function wait_for_command {
   command="${1}"
   timeout="${2:-30}"
@@ -6,7 +8,7 @@ function wait_for_command {
   until eval "${command}"; do
     ((i++))
     if [ "${i}" -gt "${timeout}" ]; then
-      echo "command was never successful, aborting due to ${timeout}s timeout!"
+      echo -e "${Red}command was never successful, aborting due to ${timeout}s timeout!${ColorReset}"
       exit 1
     fi
     sleep 1
@@ -30,7 +32,7 @@ function wait_for_url {
     fi
 
     if [[ ${i} -ge ${attempts_number} ]]; then
-      echo "$url was never responding with status ${target_status}, aborting due to $((wait_time * attempts_number)) s timeout!"
+      echo -e "${Red}$url was never responding with status ${target_status}, aborting due to $((wait_time * attempts_number)) s timeout!${ColorReset}"
       exit 1
     fi
     sleep "${wait_time}"

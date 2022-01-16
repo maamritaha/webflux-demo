@@ -14,7 +14,7 @@ to start the project using a local machine :
 * run command [java -jar ./target/*.jar]
 #### with docker
 * make sure that [docker](https://www.docker.com/) is installed
-* make sure entry-point.sh and ./docker/wait-until.sh are executable
+* make sure entry-point.sh and ./.docker/wait-until.sh are executable
 * run command [./entry-point.sh]
 
 ### Other Reference Documentation
