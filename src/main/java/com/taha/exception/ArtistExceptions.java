@@ -1,11 +1,13 @@
 package com.taha.exception;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @Slf4j
+@NoArgsConstructor
 public class ArtistExceptions {
     public static <T> Mono<T> artistNotFoundException(Object notFoundObject) {
         return Mono.defer(() -> {

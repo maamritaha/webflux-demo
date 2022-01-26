@@ -1,0 +1,3 @@
+url: jdbc:h2:file:./target/tmp/db/referential
+username: sa
+password:

@@ -149,7 +149,6 @@ class ArtistServiceTest {
 
         StepVerifier.create(artistServiceMock.update(artistDto))
                 .expectSubscription()
-                .expectNext(artistDtoUpdated)
                 .verifyComplete();
     }
 

@@ -1,0 +1,9 @@
+spring:
+  r2dbc:
+    url: r2dbc:h2:file:///./target/tmp/db/referential
+    username: sa
+    password:
+
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG

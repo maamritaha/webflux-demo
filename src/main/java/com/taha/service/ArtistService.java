@@ -34,11 +34,11 @@ public class ArtistService {
         return artistRepository.save(artistEntity).map(ArtistMapper.INSTANCE::artistEntityToArtistDto);
     }
 
-    public Mono<ArtistDto> update(final ArtistDto artistDto) {
+    public Mono<Void> update(final ArtistDto artistDto) {
         ArtistEntity artistEntity = ArtistMapper.INSTANCE.artistDtoToArtistEntity(artistDto);
         return artistRepository.findById(artistEntity.getId())
                 .switchIfEmpty(ArtistExceptions.artistNotFoundException(artistEntity)).map(v -> artistEntity)
-                .flatMap(artistRepository::save).map(ArtistMapper.INSTANCE::artistEntityToArtistDto);
+                .flatMap(artistRepository::save).then();
     }
 
     public Mono<Void> delete(final Long id) {

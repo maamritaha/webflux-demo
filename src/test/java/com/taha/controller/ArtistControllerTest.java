@@ -59,7 +59,7 @@ class ArtistControllerTest {
                 .thenReturn(Mono.empty());
 
         BDDMockito.when(artistServiceMock.update(artistDto))
-                .thenReturn(Mono.just(artistDto));
+                .thenReturn(Mono.empty());
     }
 
     @Test
@@ -143,7 +143,6 @@ class ArtistControllerTest {
     void update_Artist_Successful() {
         StepVerifier.create(artistControllerMock.update(Mono.just(artistDto)))
                 .expectSubscription()
-                .expectNext(artistDto)
                 .verifyComplete();
     }
 

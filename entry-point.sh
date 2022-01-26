@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 source .env.dev
-source ./.docker/project/wait.sh
+source ./.docker/util/wait.sh
 Green='\033[0;32m'
 ColorReset='\033[0m'
 echo -e "${Green}build java project${ColorReset}"

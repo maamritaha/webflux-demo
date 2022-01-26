@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
-source ./.docker/sonarQube/urlEncode.sh
-source ./.docker/project/wait.sh
+source ./.docker/util/urlEncode.sh
+source ./.docker/util/wait.sh
 docker-compose -f ./.docker/sonarQube/docker-compose.yml up -d
 wait_for_url "http://localhost:9000"
 mvn clean verify sonar:sonar
