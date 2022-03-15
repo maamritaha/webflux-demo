@@ -20,9 +20,8 @@ public class ArtistService {
                 .switchIfEmpty(ArtistExceptions.artistNotFoundException(id));
     }
 
-    public Mono<ArtistDto> getByName(String name) {
-        return artistRepository.findByName(name).map(ArtistMapper.INSTANCE::artistEntityToArtistDto)
-                .switchIfEmpty(ArtistExceptions.artistNotFoundException(name));
+    public Flux<ArtistDto> getByName(String name) {
+        return artistRepository.findByName(name).map(ArtistMapper.INSTANCE::artistEntityToArtistDto);
     }
 
     public Flux<ArtistDto> getAll() {
@@ -37,8 +36,10 @@ public class ArtistService {
     public Mono<Void> update(final ArtistDto artistDto) {
         ArtistEntity artistEntity = ArtistMapper.INSTANCE.artistDtoToArtistEntity(artistDto);
         return artistRepository.findById(artistEntity.getId())
-                .switchIfEmpty(ArtistExceptions.artistNotFoundException(artistEntity)).map(v -> artistEntity)
-                .flatMap(artistRepository::save).then();
+                .switchIfEmpty(ArtistExceptions.artistNotFoundException(artistEntity))
+                .map(artist -> artistEntity)
+                .flatMap(artistRepository::save)
+                .then();
     }
 
     public Mono<Void> delete(final Long id) {

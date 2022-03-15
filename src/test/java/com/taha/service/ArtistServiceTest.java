@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 class ArtistServiceTest {
 
     @InjectMocks
-    private ArtistService artistServiceMock;
+    private ArtistService artistService;
 
     @Mock
     private ArtistRepository artistRepositoryMock;
@@ -43,25 +43,19 @@ class ArtistServiceTest {
     public void given() {
         BDDMockito.when(artistRepositoryMock.findAll())
                 .thenReturn(Flux.just(artistEntity));
-
         BDDMockito.when(artistRepositoryMock.findById(ArgumentMatchers.anyLong()))
                 .thenReturn(Mono.just(artistEntity));
-
         BDDMockito.when(artistRepositoryMock.findByName(ArgumentMatchers.anyString()))
-                .thenReturn(Mono.just(artistEntity));
-
+                .thenReturn(Flux.just(artistEntity));
         BDDMockito.when(artistRepositoryMock.save(artistEntityDetached))
                 .thenReturn(Mono.just(artistEntity));
-
         BDDMockito.when(artistRepositoryMock.deleteById(ArgumentMatchers.anyLong()))
                 .thenReturn(Mono.empty());
-
         BDDMockito.when(artistRepositoryMock.save(artistEntityDetached))
                 .thenReturn(Mono.just(artistEntity));
     }
 
     @Test
-    @DisplayName("check if blockHound works")
     public void blockHoundWorks() {
         try {
             FutureTask<?> task = new FutureTask<>(() -> {
@@ -78,114 +72,109 @@ class ArtistServiceTest {
 
 
     @Test
-    @DisplayName("getById returns a Mono with artist when it exists")
     void getById_ReturnMonoArtist_WhenSuccessful() {
-        StepVerifier.create(artistServiceMock.getById(1L))
+        //when
+        StepVerifier.create(artistService.getById(1L))
+                //then
                 .expectSubscription()
                 .expectNext(artistDto)
                 .verifyComplete();
     }
 
     @Test
-    @DisplayName("getByName returns a Mono with artist when it exists")
     void getByName_ReturnMonoArtist_WhenSuccessful() {
-        StepVerifier.create(artistServiceMock.getByName("Artist"))
+        //when
+        StepVerifier.create(artistService.getByName("Artist"))
+                //then
                 .expectSubscription()
                 .expectNext(artistDto)
                 .verifyComplete();
     }
 
     @Test
-    @DisplayName("getAll returns a flux of artist")
     void getAllReturnFluxArtist_WhenSuccessful() {
-        StepVerifier.create(artistServiceMock.getAll())
+        //when
+        StepVerifier.create(artistService.getAll())
+                //then
                 .expectSubscription()
                 .expectNext(artistDto)
                 .verifyComplete();
     }
 
     @Test
-    @DisplayName("getById returns Mono error when anime does not exist")
     public void getById_ReturnMonoError_WhenEmptyMonoIsReturned() {
+        //given
         BDDMockito.when(artistRepositoryMock.findById(ArgumentMatchers.anyLong()))
                 .thenReturn(Mono.empty());
-
-        StepVerifier.create(artistServiceMock.getById(1l))
+        //when
+        StepVerifier.create(artistService.getById(1l))
+                //then
                 .expectSubscription()
                 .expectError(ResponseStatusException.class)
                 .verify();
     }
 
     @Test
-    @DisplayName("getByName returns Mono error when artist does not exist")
-    public void getByName_ReturnMonoError_WhenEmptyMonoIsReturned() {
-        BDDMockito.when(artistRepositoryMock.findByName(ArgumentMatchers.anyString()))
-                .thenReturn(Mono.empty());
-
-        StepVerifier.create(artistServiceMock.getByName("Artist"))
-                .expectSubscription()
-                .expectError(ResponseStatusException.class)
-                .verify();
-    }
-
-    @Test
-    @DisplayName("creates an artist successfully")
     public void create_Artist_Successful() {
+        //given
         ArtistDto artistDtoToBeSaved = ArtistDto.builder().name("Artist").build();
-
-        StepVerifier.create(artistServiceMock.create(artistDtoToBeSaved))
+        //when
+        StepVerifier.create(artistService.create(artistDtoToBeSaved))
+                //then
                 .expectSubscription()
                 .expectNext(artistDto)
                 .verifyComplete();
     }
 
     @Test
-    @DisplayName("updates an artist successfully")
     void update_Artist_Successful() {
+        //given
         ArtistEntity artistEntityUpdated = ArtistEntity.builder().name("ArtistUpdated").id(1L).build();
-        ArtistDto artistDtoUpdated = ArtistDto.builder().name("ArtistUpdated").id(1L).build();
         BDDMockito.when(artistRepositoryMock.save(artistEntity))
                 .thenReturn(Mono.just(artistEntityUpdated));
-
-        StepVerifier.create(artistServiceMock.update(artistDto))
+        //when
+        StepVerifier.create(artistService.update(artistDto))
+                //then
                 .expectSubscription()
                 .verifyComplete();
     }
 
     @Test
-    @DisplayName("updates an artist return error when not exist")
     void update_Artist_ReturnMonoError() {
+        //given
         BDDMockito.when(artistRepositoryMock.findById(ArgumentMatchers.anyLong()))
                 .thenReturn(Mono.empty());
-
-        StepVerifier.create(artistServiceMock.update(artistDto))
+        //when
+        StepVerifier.create(artistService.update(artistDto))
+                //then
                 .expectSubscription()
                 .expectError(ResponseStatusException.class)
                 .verify();
     }
 
     @Test
-    @DisplayName("deletes an artist successfully")
     void delete_Artist_Successful() {
+        //given
         BDDMockito.when(artistRepositoryMock.findById(ArgumentMatchers.anyLong()))
                 .thenReturn(Mono.just(artistEntity));
         BDDMockito.when(artistRepositoryMock.delete(artistEntity))
                 .thenReturn(Mono.empty());
-        StepVerifier.create(artistServiceMock.delete(artistDto.getId()))
+        //when
+        StepVerifier.create(artistService.delete(artistDto.getId()))
+                //then
                 .expectSubscription()
                 .verifyComplete();
     }
 
     @Test
-    @DisplayName("deletes an artist return error when not exist")
     void delete_Artist_ReturnMonoError() {
+        //given
         BDDMockito.when(artistRepositoryMock.findById(ArgumentMatchers.anyLong()))
                 .thenReturn(Mono.empty());
-        BDDMockito.when(artistRepositoryMock.delete(artistEntity))
-                .thenReturn(Mono.empty());
-        StepVerifier.create(artistServiceMock.delete(artistDto.getId()))
+        //when
+        StepVerifier.create(artistService.delete(artistDto.getId()))
+                //then
                 .expectError(ResponseStatusException.class)
                 .verify();
     }
-
 }

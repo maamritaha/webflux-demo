@@ -1,7 +1,6 @@
 package com.taha.integration;
 
 import com.taha.dto.ArtistDto;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +14,18 @@ import reactor.blockhound.BlockHound;
 import reactor.blockhound.BlockingOperationError;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.Collections;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.TEXT_EVENT_STREAM;
 
 @ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-public class ArtistControllerIT {
+public class ArtistIT {
 
     @Autowired
     WebTestClient client;
@@ -52,45 +55,93 @@ public class ArtistControllerIT {
 
     @Order(2)
     @Test
-    @DisplayName("creates an artist successfully")
-    public void create_artist() {
-
+    public void createArtist_Successfully() {
         this.client
                 .post()
                 .uri("/artist")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .body(BodyInserters.fromValue(ArtistDto.builder().name("Artist1").build()))
                 .exchange()
                 .expectStatus()
                 .isCreated()
-                .expectBody(ArtistDto.class)
-                .returnResult()
-                .getResponseBody()
-                .getName()
-                .equals(artistDto.getName())
-                ;
+                .expectHeader()
+                .location("/artist/1");
     }
 
     @Order(3)
     @Test
-    @DisplayName("update an artist successfully")
-    public void update_artist() {
-
+    public void updateArtist_Successfully() {
         this.client
                 .put()
                 .uri("/artist")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .body(BodyInserters.fromValue(ArtistDto.builder().id(1L).name("Artist2").build()))
                 .exchange()
                 .expectStatus()
                 .isNoContent();
-        ;
     }
 
     @Order(4)
     @Test
-    @DisplayName("get all artists")
-    public void getAll() {
+    public void updateArtist_NotFound() {
+        this.client
+                .put()
+                .uri("/artist")
+                .contentType(APPLICATION_JSON)
+                .body(BodyInserters.fromValue(ArtistDto.builder().id(2L).name("Artist2").build()))
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Order(5)
+    @Test
+    public void getById_Successfully() {
+        this.client
+                .get()
+                .uri("/artist/1")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(ArtistDto.class)
+                .returnResult()
+                .getResponseBody()
+                .get(0)
+                .getName()
+                .equals("Artist2");
+    }
+
+    @Order(6)
+    @Test
+    public void getById_NotFound() {
+        this.client
+                .get()
+                .uri("/artist/2")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Order(7)
+    @Test
+    public void getByName_Successfully() {
+        this.client
+                .get()
+                .uri("/artist/name/Artist2")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(ArtistDto.class)
+                .returnResult()
+                .getResponseBody()
+                .get(0)
+                .getId()
+                .equals(1L);
+    }
+
+    @Order(8)
+    @Test
+    public void getAll_Successfully() {
         this.client
                 .get()
                 .uri("/artist")
@@ -105,6 +156,26 @@ public class ArtistControllerIT {
                 .equals("Artist2");
     }
 
+    @Order(9)
+    @Test
+    public void deleteArtist_Successfully() {
+        this.client
+                .delete()
+                .uri("/artist/1")
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+    }
 
+    @Order(10)
+    @Test
+    public void deleteArtist_NotFound() {
+        this.client
+                .delete()
+                .uri("/artist/1")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
 
 }

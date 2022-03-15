@@ -5,9 +5,9 @@ source ./.docker/util/wait.sh
 Green='\033[0;32m'
 ColorReset='\033[0m'
 echo -e "${Green}build java project${ColorReset}"
-./mvnw clean package
+./mvnw clean package -T 4C
 echo -e "${Green}docker clean up${ColorReset}"
-docker-compose -f ./.docker/project/docker-compose.yml --env-file .env.dev down -v
+docker-compose -f ./.docker/project/docker-compose.yml down -v
 echo -e "${Green}starting project${ColorReset}"
 docker-compose -f ./.docker/project/docker-compose.yml --env-file .env.dev up -d db
 wait_for_command "docker-compose -f ./.docker/project/docker-compose.yml exec db psql \

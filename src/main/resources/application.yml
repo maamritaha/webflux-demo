@@ -5,7 +5,7 @@ management:
 
 spring:
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/referential
+    url: r2dbc:postgresql://db:5432/referential
     username: admin
     password: admin
 

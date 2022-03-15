@@ -23,6 +23,7 @@
         <postgres.for.liquibase.version>42.2.24</postgres.for.liquibase.version>
         <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
         <sonar.maven.plugin.version>3.7.0.1746</sonar.maven.plugin.version>
+        <skip.liquibase>false</skip.liquibase>
         <!-- test result measurements -->
         <project.test.result.directory>${project.build.directory}/test-results</project.test.result.directory>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
@@ -123,7 +124,12 @@
             <version>2.1.210</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -264,6 +270,7 @@
                 <version>${liquibase.plugin.version}</version>
                 <configuration>
                     <propertyFile>classpath:liquibase.yml</propertyFile>
+                    <skip>${skip.liquibase}</skip>
                 </configuration>
                 <dependencies>
                     <dependency>

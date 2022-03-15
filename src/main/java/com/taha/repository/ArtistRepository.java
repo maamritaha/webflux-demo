@@ -2,8 +2,8 @@ package com.taha.repository;
 
 import com.taha.bean.ArtistEntity;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 public interface ArtistRepository extends R2dbcRepository<ArtistEntity,Long> {
-    Mono<ArtistEntity> findByName(String name);
+    Flux<ArtistEntity> findByName(String name);
 }
