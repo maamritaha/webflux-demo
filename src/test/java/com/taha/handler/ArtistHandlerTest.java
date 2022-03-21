@@ -99,7 +99,7 @@ class ArtistHandlerTest {
         BDDMockito.when(artistServiceMock.delete(1L))
                 .thenReturn(Mono.empty());
         BDDMockito.when(artistServiceMock.delete(2L))
-                .thenReturn(ArtistExceptions.artistNotFoundException(3L));
+                .thenReturn(ArtistExceptions.artistNotFoundException(2L));
         BDDMockito.when(artistServiceMock.update(artistDto))
                 .thenReturn(Mono.empty());
         BDDMockito.when(artistServiceMock.update(nonExistentArtistDtoForUpdate))
@@ -297,15 +297,15 @@ class ArtistHandlerTest {
         //when
         MockServerWebExchange exchange = MockServerWebExchange.from(
                 MockServerHttpRequest.delete(""));
-        exchange.getAttributes().put(RouterFunctions.URI_TEMPLATE_VARIABLES_ATTRIBUTE, idPathVariable);
+        exchange.getAttributes().put(RouterFunctions.URI_TEMPLATE_VARIABLES_ATTRIBUTE, nonExistentIdPathVariable);
         ServerRequest serverRequest = ServerRequest.create(exchange, HandlerStrategies.withDefaults().messageReaders());
         Mono<ServerResponse> serverResponseMono = artistHandler.delete(serverRequest);
         //then
         Mono<Void> resultMono = serverResponseMono.flatMap(response -> {
-            assertThat(response.statusCode(), is(HttpStatus.NO_CONTENT));
+            assertThat(response.statusCode(), is(HttpStatus.NOT_FOUND));
             return response.writeTo(exchange, context);
         });
         StepVerifier.create(resultMono)
-                .expectComplete().verify();
+                .expectErrorMessage(notFoundError).verify();
     }
 }

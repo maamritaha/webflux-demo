@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.TEXT_EVENT_STREAM;
 @ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
+@AutoConfigureWebTestClient(timeout = "PT36S")
 public class ArtistIT {
 
     @Autowired

@@ -6,8 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 
 @Data
 @Builder
@@ -15,7 +14,6 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ArtistDto {
     private Long id;
-    @NotNull
-    @NotBlank
+    @NotEmpty
     private String name;
 }
