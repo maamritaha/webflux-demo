@@ -178,4 +178,16 @@ public class ArtistIT {
                 .isNotFound();
     }
 
+    @Order(11)
+    @Test
+    public void when_any_cors_origin_is_defined_then_accept_connection(){
+        this.client
+                .get()
+                .uri("/artist")
+                .header("Origin", "http://any-origin.com")
+                .exchange()
+                .expectHeader()
+                .valueEquals("Access-Control-Allow-Origin", "*");
+    }
+
 }
